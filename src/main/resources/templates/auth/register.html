@@ -18,12 +18,38 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <form th:action="@{/register/save}" th:object="${user}"></form>
+                        <form th:action="@{/register/save}" th:object="${user}" method="post" role="form">
+                            <div class="form-group mb-3">
+                                <label class="form-label">First Name</label>
+                                <input type="text" th:field="*{firstName}" name="firstName" id="firstName" placeholder="Enter your first name" class="form-control"/>
+                                <p class="class-danger" th:errors="*{firstName}" th:if="${#fields.hasErrors('firstName')}"></p>
+                            </div>
+                            <div class="form-group mb-3">
+                               <label class="form-label">Last Name</label> 
+                               <input type="text" th:field="*{lastName}" name="lastName" id="lastName" placeholder="Enter your last name" class="form-control"/>
+                               <p class="class-danger" th:errors="*{lastName}" th:if="${#fields.hasErrors('lastName')}"></p>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="text" th:field="*{email}" name="email" id="email" placeholder="Enter your email" class="form-control"/>
+                                <p class="class-danger" th:errors="*{email}" th:if="${#fields.hasErrors('email')}"></p>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Password</label>
+                                <input type="password" id="password" placeholder="Enter your password" th:field="*{password}"/>
+                                <p class="class-danger" th:errors="*{password}" th:if="${#fields.hasErrors('password')}"></p>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-success" type="submit">Register</button>
+                                <span>Already have an account? <a th:href="@{/login}">Login</a></span>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
     <head th:insert="~{index::footer}"></head>
     <script th:replace="~{index::bootstrapScript}"></script>
 </body>
