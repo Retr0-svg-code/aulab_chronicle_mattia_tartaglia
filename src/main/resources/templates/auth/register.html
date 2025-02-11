@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{index::head}"></head>
+<body>
+    
+    <head th:insert="~{index::navbar}"></head>
+    <div class="vh-100">
+        <br/><br/><br/>
+        <div class="container">
+            <div class="row col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="text-center">Registration</h2>
+                    </div>
+                    <div th:if="~{param.success}">
+                        <div class="altert altert-info">
+                            You have successfully registered to our app!
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/register/save}" th:object="${user}"></form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <head th:insert="~{index::footer}"></head>
+    <script th:replace="~{index::bootstrapScript}"></script>
+</body>
+</html>
