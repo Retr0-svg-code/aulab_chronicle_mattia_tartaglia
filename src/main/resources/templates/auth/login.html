@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:insert="~{index::head}"></head>
 <body>
-    <head th:insert="~{index::navbar}"></head>
+    <div th:insert="~{index::navbar}"></div>
     
     <div class="vh-100">
         <br/><br/>
@@ -30,7 +30,7 @@
                                     <input type="text" id="password" class="form-control" name="password" placeholder="Enter your password">
                                 </div>
                                 <div class="form-group mb-3">
-                                    <button type="submit" class="btn btn-primary">Submit></button>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
                                     <span>Not Registered? <a th:href="@{/register}">Register/Sign up here</a>
                                     </span>
                                 </div>
@@ -42,7 +42,7 @@
         </div>
     </div>
     
-    <head th:insert="~{index::footer}"></head>
+    <div th:insert="~{index::footer}"></div>
     <script th:replace="~{index::bootstrapScript}"></script>
 </body>
 </html>

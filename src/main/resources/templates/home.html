@@ -2,16 +2,18 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:insert="~{index::head}"></head>
 <body>
+    <div th:insert="~{index::navbar}"></div>
     
-    <head th:insert="~{index::navbar}"></head>
     <div th:if="${param.notAuthorized}">
         <div class="alert alert-danger">
             You are not authorized to access this page
         </div>
     </div>
+
     <div th:if="${successMessage}" class="alert alert-success">
         <p th:text="${successMessage}"></p>
     </div>
+
     <div class="container-fluid">
         <div class="row ms-5 vh-100 align-items-center">
             <div class="col-10">
@@ -19,6 +21,7 @@
             </div>
         </div>
     </div>
+
     <div th:insert="~{index::footer}"></div>
     <script th:replace="~{index::bootstrapScript}"></script>
 </body>

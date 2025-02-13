@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
     
     public void authenticateUserAndSetSession(User user, UserDto userDto, HttpServletRequest request) {
         try {
-             CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(user.getEmail());
+            CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(user.getEmail());
 
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDto.getPassword());
             
