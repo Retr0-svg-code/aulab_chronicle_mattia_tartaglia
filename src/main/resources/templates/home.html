@@ -4,19 +4,22 @@
 <body>
     
     <head th:insert="~{index::navbar}"></head>
-        <div th:if="${param.notAuthorized}">
-            <div class="alert alert-danger">
-                You are not authorized to access this page
+    <div th:if="${param.notAuthorized}">
+        <div class="alert alert-danger">
+            You are not authorized to access this page
+        </div>
+    </div>
+    <div th:if="${successMessage}" class="alert alert-success">
+        <p th:text="${successMessage}"></p>
+    </div>
+    <div class="container-fluid">
+        <div class="row ms-5 vh-100 align-items-center">
+            <div class="col-10">
+                <h1 class="mb-5">Welcome to <span class="display-4 fw-bold d-block">New Aulab Article</span></h1>
             </div>
         </div>
-        <div class="container-fluid">
-            <div class="row ms-5 vh-100 align-items-center">
-                <div class="col-10">
-                    <h1 class="mb-5">Welcome to <span class="display-4 fw-bold d-block">New Aulab Article</span></h1>
-                </div>
-         </div>
-        </div>
-    <head th:insert="~{index::footer}"></head>
+    </div>
+    <div th:insert="~{index::footer}"></div>
     <script th:replace="~{index::bootstrapScript}"></script>
 </body>
 </html>

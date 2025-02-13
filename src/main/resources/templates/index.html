@@ -30,13 +30,13 @@
                             Accesso
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Register</a></li>
-                            <li><a class="dropdown-item" href="#">Login</a></li>
-                            <li><a class="dropdown-item" href="#">Logout</a></li>
+                            <li sec:authorize="isAnonymous"><a class="dropdown-item" th:href="@{/register}">Register</a></li>
+                            <li sec:authorize="isAnonymous"><a class="dropdown-item" th:href="@{/login}">Login</a></li>
+                            <li sec:authorize="isAuthenticated"><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
                         </ul>
                     </li>
                 </ul>
-                <div>Benvenuto</div>
+                <div sec:authorize="isAuthenticated" th:text=" 'Benvenuto ' + ${#authentication.principal.fullname} + ' - ' + ${#authentication.principal.authorities[0].authority.replace('ROLE_', '')}">Benvenuto</div>
             </div>
         </div>
         <form class="d-flex">
