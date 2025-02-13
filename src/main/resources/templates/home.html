@@ -4,6 +4,11 @@
 <body>
     
     <head th:insert="~{index::navbar}"></head>
+        <div th:if="${param.notAuthorized}">
+            <div class="alert alert-danger">
+                You are not authorized to access this page
+            </div>
+        </div>
         <div class="container-fluid">
             <div class="row ms-5 vh-100 align-items-center">
                 <div class="col-10">
