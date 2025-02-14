@@ -36,3 +36,10 @@ CREATE TABLE users_roles (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
+
+CREATE TABLE images(
+    id BIGINT auto_increment PRIMARY KEY,
+    PATH VARCHAR(255) NOT NULL,
+    article_id BIGINT,
+    FOREIGN KEY (article_id) REFERENCES articles(id)
+);
