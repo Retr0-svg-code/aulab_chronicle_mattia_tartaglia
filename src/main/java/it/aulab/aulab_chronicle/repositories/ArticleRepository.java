@@ -8,7 +8,7 @@ import it.aulab.aulab_chronicle.models.Article;
 import it.aulab.aulab_chronicle.models.Category;
 import it.aulab.aulab_chronicle.models.User;
 
-public interface ArticleRepository extends ListCrudRepository<Article, Integer> {
+public interface ArticleRepository extends ListCrudRepository<Article, Long> {
     List<Article> findByCategory(Category category);
     List<Article> findByUser(User user);
 }

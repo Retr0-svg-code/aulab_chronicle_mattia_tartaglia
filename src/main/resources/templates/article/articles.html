@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{index::head}"></head>
+<body>
+    <div th:insert="~{index::navbar}"></div>
+    
+    <div class="min-vh-100">
+        <div th:if="${succesMessage}" class="alter alert-success">
+            <p th:text="${succesMessage}"></p>
+        </div>
+        
+        
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-10 mb-5">
+                    <h1 class="text-center" th:text="${title}">Indice articoli</h1>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container" th:if="${articles.size() > 0}">
+            <div class="row justify-content-center mb-5">
+                <div th:each="article : ${articles}" class="col-12 col-md-4 d-flex justify-content-center">
+                    <div class="card mb-3" style="width: 18rem;">
+                        <img th:src="${article.image.path}" th:if="${article.image != null}" class="card-img-top" alt="...">
+                        <img th:src="@{/image/default.jpg}" th:if="${article.image != null}" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${article.title}"></h5>
+                            <p class="card-text" th:text="${article.subtitle}"></p>
+                            <p class="card-text" th:text="${article.user.username}"></p>
+                            
+                            <a th:href="@{/articles/detail/{id}{id=${article.id}}}" class="btn btn-primary"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center vh-100" th:unless="${articles.size() > 0}">
+            <div class="col-10 mb-5">
+                <h1 class="text-center">NESSUN ARTICOLO PRESENTE</h1>
+            </div>
+        </div>
+    </div>
+     
+    <div th:insert="~{index::footer}"></div>
+    <script th:replace="~{index::bootstrapScript}"></script>
+</body>
+</html>
