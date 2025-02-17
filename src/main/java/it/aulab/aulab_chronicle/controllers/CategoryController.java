@@ -37,4 +37,12 @@ public class CategoryController {
 
         return "article/articles";
     }
+
+    //rotta creazione categoria
+    @GetMapping("create")
+    public String categoryCreate(Model viewModel){
+        viewModel.addAttribute("title", "Crea categoria");
+        viewModel.addAttribute("category", new CategoryDto());
+        return "categories/create";
+    }
 }

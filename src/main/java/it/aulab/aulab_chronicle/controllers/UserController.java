@@ -18,7 +18,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import it.aulab.aulab_chronicle.dtos.ArticleDto;
 import it.aulab.aulab_chronicle.dtos.UserDto;
 import it.aulab.aulab_chronicle.models.User;
+import it.aulab.aulab_chronicle.repositories.CareerRequestRepository;
 import it.aulab.aulab_chronicle.services.ArticleService;
+import it.aulab.aulab_chronicle.services.CategoryService;
 import it.aulab.aulab_chronicle.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,6 +32,10 @@ public class UserController {
     private UserService userService;
     @Autowired
     private ArticleService articleService;
+    @Autowired
+    private CareerRequestRepository careerRequestRepository;
+    @Autowired
+    private CategoryService categoryService;
 
     //rotta della home
     @GetMapping("/")
@@ -89,5 +95,14 @@ public class UserController {
         viewModel.addAttribute("articles", articles);
 
         return "article/articles";
+    }
+
+    @GetMapping("/admin/dashboard")
+    public String adminDashboard(Model viewModel) {
+        viewModel.addAttribute("title", "Richieste ricevute");
+        viewModel.addAttribute("requests", careerRequestRepository.findByIsCheckedFalse());
+        viewModel.addAttribute("categories", categoryService.readAll());
+
+        return "admin/dashboard";
     }
 }

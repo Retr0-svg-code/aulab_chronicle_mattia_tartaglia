@@ -25,6 +25,15 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/articles">Articoli</a>
                     </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
+                        <div class="d-flex">
+                            <a class="nav-link" href="/admin/dashboard">Dashboard admin</a>
+                            <div class="mt-1" th:if="${careerRequests > 0}">
+                                <i class="fas fa-bell fa-l pt-2"></i>
+                                <span class="badge rounded-pill bg-danger text-white px-1" th:text="${careerRequests}"></span>
+                            </div>
+                        </div>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="navbarDropdown">
                             Accesso
@@ -57,7 +66,7 @@
                 <!-- info contatti -->
                 <div class="col-md-4 mb-3 text-end">
                     <h5>Lavora con noi</h5>
-                    <a href="#" class="btn btn-primary">Richiedi</a>
+                    <a th:href="@{/operations/career/request}" class="btn btn-primary">Richiedi</a>
                 </div>
             </div>
         </div>

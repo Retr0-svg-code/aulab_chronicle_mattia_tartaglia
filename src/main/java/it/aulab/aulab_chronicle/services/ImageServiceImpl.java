@@ -23,8 +23,6 @@ import it.aulab.aulab_chronicle.repositories.ImageRepository;
 import it.aulab.aulab_chronicle.utils.StringManipulation;
 import jakarta.transaction.Transactional;
 
-import org.springframework.http.*;
-
 @Service
 public class ImageServiceImpl implements ImageService {
     @Autowired
@@ -95,6 +93,12 @@ public class ImageServiceImpl implements ImageService {
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.DELETE, entity, String.class);
         
         System.out.println(response.getBody());
+    }
+
+    @Override
+    public CompletableFuture<String> uploadImage(MultipartFile file) throws Exception {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'uploadImage'");
     }  
     
 }
