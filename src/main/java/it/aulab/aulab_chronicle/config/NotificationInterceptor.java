@@ -27,7 +27,7 @@ public class NotificationInterceptor implements HandlerInterceptor{
         }
 
         if(modelAndView != null && request.isUserInRole("ROLE_REVISOR")){
-            int revisedCount = articleRepository.findByIsAcceptedisNull().size();
+            int revisedCount = articleRepository.findByIsAcceptedIsNull().size();
             modelAndView.addObject("articlesToBeRevised", revisedCount);
         }
     }
