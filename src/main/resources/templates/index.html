@@ -19,7 +19,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
+                    <li class="nav-item" sec:authorize="isAuthenticated && hasRole('ROLE_WRITER')">
                         <a class="nav-link active" href="/articles/create">Crea articolo</a>
                     </li>
                     <li class="nav-item">
@@ -33,6 +33,18 @@
                                 <span class="badge rounded-pill bg-danger text-white px-1" th:text="${careerRequests}"></span>
                             </div>
                         </div>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_REVISOR')">
+                        <div class="d-flex">
+                            <a class="nav-link" href="/revisor/dashboard">Dashboard revisore</a>
+                            <div class="mt-1" th:if="${articlesToBeRevised > 0}">
+                                <i class="fas fa-bell fa-l pt-2"></i>
+                                <span class="badge rounded-pill bg-danger text-white px-1" th:text="${articlesToBeRevised}"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_WRITER')">
+                        <a href="/writer/dashboard" class="nav-link">Dashboard writer</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="navbarDropdown">
@@ -48,7 +60,7 @@
                 <div sec:authorize="isAuthenticated" th:text=" 'Benvenuto ' + ${#authentication.principal.fullname} + ' - ' + ${#authentication.principal.authorities[0].authority.replace('ROLE_', '')}">Benvenuto</div>
             </div>
         </div>
-        <form class="d-flex">
+        <form class="d-flex" th:action="@{/articles/search}" method="get">
             <input type="search" placeholder="search" name="keyword" aria-label="Search" class="form-control me-2">
             <button class="btn btn-outline-success" type="submit">Search</button>
         </form>

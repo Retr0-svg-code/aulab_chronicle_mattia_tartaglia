@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{index::head}"></head>
+<body>
+    <div th:insert="~{index::navbar}"></div>
+    
+    <div class="vh-100">
+        <div class="alert alert-success" th:if="${successMessage}">
+            <p th:text="${successMessage}"></p>
+        </div>
+        
+        <div class="container">
+            <div class="row">
+                <div class="col-12 my-5 d-flex justify-content-center align-items-center">
+                    <span class="h1">Dashboard Revisore</span>
+                </div>
+                
+                <div class="col-12 my-5 d-flex justify-content-center align-items-center">
+                    <span class="h1" th:text="${title}">Articoli da revisionare</span>
+                </div>
+                
+                <div class="col-12">
+                    <table class="table table-striped table-responsive-lg">
+                        <thead>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>Subtitle</th>
+                            <th>Category</th>
+                            <th>#Actions</th>
+                        </thead>
+                        <tbody>
+                            <tr th:each="article : ${articles}">
+                                <td th:text="${article.id}"></td>
+                                <td th:text="${article.title}"></td>
+                                <td th:text="${article.subtitle}"></td>
+                                <td th:text="${article.category.name}" th:if="${article.category}"></td>
+                                <td th:unless="${article.category}">Nessuna categoria</td>
+                                <td>
+                                    <a href="@{/revisor/articles/detail/{id}{id=${article.id}}}" class="btn btn-primary">
+                                        Leggi
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div th:insert="~{index::footer}"></div>
+    <script th:replace="~{index::bootstrapScript}"></script>
+</body>
+</html>

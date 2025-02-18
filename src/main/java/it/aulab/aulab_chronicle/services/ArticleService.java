@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -71,6 +70,8 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long> {
             }
         }
 
+        article.setIsAccepted(null);
+
         ArticleDto dto=modelMapper.map(articleRepository.save(article), ArticleDto.class);
         if(!file.isEmpty()){
             imageService.saveImageOnDB(url, article);
@@ -79,14 +80,78 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long> {
         return dto;
     }
     @Override
-    public ArticleDto update(Long key, Article model, MultipartFile file) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+    public ArticleDto update(Long key, Article updateArticle, MultipartFile file) {
+        String url = "";
+
+        //controllo se l'articolo esiste in base all'id
+        if(articleRepository.existsById(key)){
+            //assegno all'articolo proveniente dal form lo stesso id dell'articolo da modificare
+            updateArticle.setId(key);
+            //recupero l'articolo originale non modificato
+            Article article = articleRepository.findById(key).get();
+            //imposto l'utente dell'articolo originale all'articolo proveniente dal form
+            updateArticle.setUser(article.getUser());
+
+            //verifico se devo modificare o meno l'immagine
+            if(!file.isEmpty()){
+                try{
+                    //elimino l'immagine precedente
+                    imageService.deleteImage(article.getImage().getPath());
+                    try{
+                        //salvo l'immagine nuova
+                        CompletableFuture<String> futureUrl = imageService.saveImageOnCloud(file);
+                        url = futureUrl.get();
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                    //salvo il nuovo path nel database
+                    imageService.saveImageOnDB(url, updateArticle);
+
+                    //immagine modificata, articolo in revisione
+                    updateArticle.setIsAccepted(null);
+                    return modelMapper.map(articleRepository.save(updateArticle), ArticleDto.class);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }else if(article.getImage() == null){ //se l'articolo originale non ha nulla di nuovo, allora non è stato modificato nulla
+                updateArticle.setIsAccepted(article.getIsAccepted());
+            }else{
+                //se non è stata modificata l'immagine, faccio un check se tutti i campi e se diversi l'articolo torna in revisione
+
+                //se non è stata modificata l'immagine, rimetto la stessa immagine dell'articolo originale
+                updateArticle.setImage(article.getImage());
+
+                if(updateArticle.equals(article)==false){
+                    updateArticle.setIsAccepted(null);
+                }else{
+                    updateArticle.setIsAccepted(article.getIsAccepted());
+                }
+
+                return modelMapper.map(articleRepository.save(updateArticle), ArticleDto.class);
+            }
+        }else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        return null;
     }
+    
     @Override
     public void delete(Long key) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        if(articleRepository.existsById(key)){
+            Article article = articleRepository.findById(key).get();
+
+            try{
+                String path = article.getImage().getPath();
+                article.getImage().setArticle(null);
+                imageService.deleteImage(path);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+            articleRepository.deleteById(key);
+        }else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 
     public List<ArticleDto> searchByCategory(Category category) {
@@ -105,5 +170,18 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long> {
         return dtos;
     }
 
+    public void setIsAccepted(Boolean result, Long id){
+        Article article = articleRepository.findById(id).get();
+        article.setIsAccepted(result);
+        articleRepository.save(article);
+    }
+
+    public List<ArticleDto> search(String keyword){
+        List<ArticleDto> dtos=new ArrayList<ArticleDto>();
+        for(Article article:articleRepository.search(keyword)) {
+            dtos.add(modelMapper.map(article, ArticleDto.class));
+        }
+        return dtos;
+    }
     
 }

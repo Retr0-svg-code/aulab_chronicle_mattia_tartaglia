@@ -1,8 +1,6 @@
 package it.aulab.aulab_chronicle.models;
 
 import java.time.LocalDate;
-import java.util.Locale.Category;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -50,6 +48,9 @@ public class Article {
     @NotNull
     private LocalDate publishDate;
 
+    @Column(nullable = true)
+    private Boolean isAccepted;
+
     @ManyToOne
     @JoinColumn(name="user_id")
     @JsonIgnoreProperties({"articles"})
@@ -63,4 +64,19 @@ public class Article {
     @JsonIgnoreProperties({"article"})
     private Image image;
     
+    @Override
+    public boolean equals(Object obj){
+
+        Article article = (Article) obj;
+
+        if(title.equals(article.getTitle()) &&
+            subtitle.equals(article.getSubtitle()) &&
+            body.equals(article.getBody()) &&
+            publishDate.equals(article.getPublishDate()) &&
+            category.getName().equals(article.getCategory().getName()) &&
+            image.getPath().equals(article.getImage().getPath())){
+            return true;
+    }
+    return false;
+    }
 }
