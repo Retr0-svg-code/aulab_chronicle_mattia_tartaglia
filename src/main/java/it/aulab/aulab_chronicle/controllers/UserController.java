@@ -96,8 +96,9 @@ public class UserController {
         }
 
         userService.saveUser(userDto, redirectAttributes, request, response);
+        
         redirectAttributes.addFlashAttribute("successMessage", "User registered successfully");
-        return "redirect:/";
+        return "redirect:/register?success";
     }
 
     @GetMapping("/search/{id}")
