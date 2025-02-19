@@ -1,9 +1,12 @@
 package it.aulab.aulab_chronicle.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,11 +37,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
         name = "users_roles",
         joinColumns = {@JoinColumn(name="USER_ID", referencedColumnName="ID")},
         inverseJoinColumns ={@JoinColumn(name="ROLE_ID", referencedColumnName="ID")}
     )
-    private List<Role> roles;
+    private List<Role> roles = new ArrayList<>();
 }
