@@ -12,8 +12,8 @@
                     <div class="card-header">
                         <h2 class="text-center">Registration</h2>
                     </div>
-                    <div th:if="~{param.success}">
-                        <div class="altert altert-info">
+                    <div th:if="${param.success}">
+                        <div class="altert alert-info">
                             You have successfully registered to our app!
                         </div>
                     </div>
@@ -22,22 +22,22 @@
                             <div class="form-group mb-3">
                                 <label class="form-label">First Name</label>
                                 <input type="text" th:field="*{firstName}" name="firstName" id="firstName" placeholder="Enter your first name" class="form-control"/>
-                                <p class="class-danger" th:errors="*{firstName}" th:if="${#fields.hasErrors('firstName')}"></p>
+                                <p class="text-danger" th:errors="*{firstName}" th:if="${#fields.hasErrors('firstName')}"></p>
                             </div>
                             <div class="form-group mb-3">
                                <label class="form-label">Last Name</label> 
                                <input type="text" th:field="*{lastName}" name="lastName" id="lastName" placeholder="Enter your last name" class="form-control"/>
-                               <p class="class-danger" th:errors="*{lastName}" th:if="${#fields.hasErrors('lastName')}"></p>
+                               <p class="text-danger" th:errors="*{lastName}" th:if="${#fields.hasErrors('lastName')}"></p>
                             </div>
                             <div class="form-group mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="text" th:field="*{email}" name="email" id="email" placeholder="Enter your email" class="form-control"/>
-                                <p class="class-danger" th:errors="*{email}" th:if="${#fields.hasErrors('email')}"></p>
+                                <input type="email" th:field="*{email}" name="email" id="email" placeholder="Enter your email" class="form-control"/>
+                                <p class="text-danger" th:errors="*{email}" th:if="${#fields.hasErrors('email')}"></p>
                             </div>
                             <div class="form-group mb-3">
                                 <label class="form-label">Password</label>
                                 <input type="password" id="password" name="password" placeholder="Enter your password" th:field="*{password}" class="form-control"/>
-                                <p class="class-danger" th:errors="*{password}" th:if="${#fields.hasErrors('password')}"></p>
+                                <p class="text-danger" th:errors="*{password}" th:if="${#fields.hasErrors('password')}"></p>
                             </div>
                             <div class="form-group">
                                 <button class="btn btn-success" type="submit">Register</button>
