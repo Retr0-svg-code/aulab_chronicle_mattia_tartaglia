@@ -24,45 +24,52 @@ import jakarta.servlet.http.HttpSession;
 
 @Service
 public class UserServiceImpl implements UserService {
+    
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private RoleRepository roleRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
     @Autowired
     private AuthenticationManager authenticationManager;
-    
+
     @Override
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-    
+
     @Override
     public void saveUser(UserDto userDto, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
         User user = new User();
-        user.setUsername(userDto.getFirstName()+ " " + userDto.getLastName());
+        user.setUsername(userDto.getFirstName() + " " + userDto.getLastName());
         user.setEmail(userDto.getEmail());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-
+        
         Role role = roleRepository.findByName("ROLE_USER");
         user.setRoles(List.of(role));
-        
+
         userRepository.save(user);
+
         authenticateUserAndSetSession(user, userDto, request);
     }
-    
+
     public void authenticateUserAndSetSession(User user, UserDto userDto, HttpServletRequest request) {
         try {
-            CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(user.getEmail());
+            CustomUserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
 
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDto.getPassword());
             
             Authentication authentication = authenticationManager.authenticate(authToken);
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            
+
             HttpSession session = request.getSession(true);
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
         } catch (AuthenticationException e) {
@@ -71,7 +78,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User find(Long id){
+    public User find(Long id) {
         return userRepository.findById(id).get();
     }
+
 }

@@ -24,57 +24,57 @@ import it.aulab.aulab_chronicle.services.CareerRequestService;
 @Controller
 @RequestMapping("/operations")
 public class OperationController {
-    @Autowired
-    private RoleRepository roleRepository;
+
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
     @Autowired
     private CareerRequestService careerRequestService;
 
-    //rotta richiesta collab
     @GetMapping("/career/request")
-    public String careerRequestCreate(Model viewModel){
-        viewModel.addAttribute("title", "Richiesta di collaborazione");
+    public String careeerRequestCreate(Model viewModel) {
+        viewModel.addAttribute("title", "Inserisci la tua richiesta");
         viewModel.addAttribute("careerRequest", new CareerRequest());
 
         List<Role> roles = roleRepository.findAll();
-        //rimozione ruolo user dal form
         roles.removeIf(e -> e.getName().equals("ROLE_USER"));
         viewModel.addAttribute("roles", roles);
-
         return "career/requestForm";
     }
 
     @PostMapping("/career/request/save")
-    public String careerRequestStore(@ModelAttribute("careerRequest") CareerRequest careerRequest, Principal principal, RedirectAttributes redirectAttributes){
+    public String careerRequestStore(@ModelAttribute("careerRequest") CareerRequest careerRequest, Principal principal, RedirectAttributes redirectAttributes) {
         User user = userRepository.findByEmail(principal.getName());
 
         if(careerRequestService.isRoleAlreadyAssigned(user, careerRequest)){
-            redirectAttributes.addFlashAttribute("errorMessage", "Ruolo già assegnato!");
+            redirectAttributes.addFlashAttribute("errorMessage", "Sei già assegnato a questo ruolo");
             return "redirect:/";
         }
-
+        
         careerRequestService.save(careerRequest, user);
 
-        redirectAttributes.addFlashAttribute("successMessage", "Richiesta inviata con successo!");
+        redirectAttributes.addFlashAttribute("successMessage", "Richiesta inviata con successo");
+
         return "redirect:/";
-    }
+    }   
 
-    //rotta dettaglio della richiesta
-    @GetMapping("/career/requests/detail/{id}")
-    public String careerRequestDetail(@PathVariable("id") Long id, Model viewModel){
+    @GetMapping("/career/request/detail/{id}")
+    public String careerRequestDetail(@PathVariable("id") Long id, Model viewModel) {
         viewModel.addAttribute("title", "Dettaglio richiesta");
-        viewModel.addAttribute("careerRequest", careerRequestService.find(id));
-
+        viewModel.addAttribute("request", careerRequestService.find(id));
         return "career/requestDetail";
     }
 
-    //rotta accettazione della richiesta
-    @PostMapping("/career/requests/accept/{requestId}")
-    public String careerRequestAccept(@PathVariable Long requestId, RedirectAttributes redirectAttributes){
+    @PostMapping("/career/request/accept/{requestId}")
+    public String careerRequestAccept(@PathVariable Long requestId, RedirectAttributes redirectAttributes) {
+        
         careerRequestService.careerAccept(requestId);
-        redirectAttributes.addFlashAttribute("successMessage", "Ruolo abilitato con successo!");
+        redirectAttributes.addFlashAttribute("successMesage", "Ruolo abilitato per l'utente");
 
         return "redirect:/admin/dashboard";
     }
+
 }

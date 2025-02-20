@@ -35,65 +35,64 @@ import jakarta.validation.Valid;
 @Controller
 @RequestMapping("/articles")
 public class ArticleController {
-    //rotta creazione articolo
+
     @Autowired
     @Qualifier("categoryService")
-    private CrudService<CategoryDto, Category, Long> categoryService;
-    
+    private CrudService<CategoryDto,Category,Long> categoryService;
+
     @Autowired
     private ArticleService articleService;
+
     @Autowired
     private ArticleRepository articleRepository;
+
     @Autowired
     private ModelMapper modelMapper;
-    
-    //rotta index articoli
+
     @GetMapping
-    public String articlesIndex(Model viewModel){
-        viewModel.addAttribute("title", "Articoli");
-        
+    public String articlesIndex(Model viewModel) {
+        viewModel.addAttribute("title", "Tutti gli articoli");
+
         List<ArticleDto> articles = new ArrayList<ArticleDto>();
-        for(Article article : articleRepository.findByIsAcceptedTrue()){
+        for(Article article: articleRepository.findByIsAcceptedTrue()){
             articles.add(modelMapper.map(article, ArticleDto.class));
         }
-        
+
         Collections.sort(articles, Comparator.comparing(ArticleDto::getPublishDate).reversed());
         viewModel.addAttribute("articles", articles);
-        
+
         return "article/articles";
     }
-    
+
     @GetMapping("create")
-    public String articleCreate(Model viewModel){ 
-        viewModel.addAttribute("title", "Crea articolo");
+    public String articleCreate(Model viewModel) {
+        viewModel.addAttribute("title", "Crea un articolo");
         viewModel.addAttribute("article", new Article());
         viewModel.addAttribute("categories", categoryService.readAll());
-        return "articles/create";
+        return "article/create";
     }
-    
-    //rotta store articolo
+
     @PostMapping
-    public String articleStore(@Valid @ModelAttribute("article") Article article, 
-    BindingResult result, 
-    Model viewModel,
-    RedirectAttributes redirectAttributes,
-    Principal principal,
-    MultipartFile file) {
-        
-        //controllo errori validazione
-        if(result.hasErrors()){
-            viewModel.addAttribute("title", "Crea articolo");
-            viewModel.addAttribute("categories", categoryService.readAll());
-            viewModel.addAttribute("categories", categoryService.readAll());
-            return "articles/create";
-        }
-        
-        articleService.create(article, principal, file);
-        redirectAttributes.addFlashAttribute("successMessage", "Articolo creato con successo!");
-        return "redirect:/";
+    public String articleStore(@Valid @ModelAttribute("article") Article article,
+                                BindingResult result,
+                                RedirectAttributes redirectAttributes,
+                                Principal principal,
+                                MultipartFile file,
+                                Model viewModel) {
+    
+    if (result.hasErrors()) {
+        viewModel.addAttribute("title", "Crea un articolo");
+        viewModel.addAttribute("article", article);
+        viewModel.addAttribute("categories", categoryService.readAll());
+        return "article/create";
     }
     
-    //rotta dettaglio articolo
+    articleService.create(article, principal, file);
+    redirectAttributes.addFlashAttribute("successMessage", "Articolo aggiunto con successo!");
+
+    return "redirect:/";
+    }
+
     @GetMapping("detail/{id}")
     public String detailArticle(@PathVariable("id") Long id, Model viewModel) {
         viewModel.addAttribute("title", "Article detail");
@@ -101,76 +100,39 @@ public class ArticleController {
         return "article/detail";
     }
 
-    //rotta modifica articolo
-    @GetMapping("edit/{id}")
+    @GetMapping("/edit/{id}")
     public String editArticle(@PathVariable("id") Long id, Model viewModel) {
-        viewModel.addAttribute("title", "Modifica articolo");
+        viewModel.addAttribute("title", "Article update");
         viewModel.addAttribute("article", articleService.read(id));
         viewModel.addAttribute("categories", categoryService.readAll());
         return "article/edit";
     }
 
-    //rotta memorizzazione modifica articolo
-    @PostMapping("/update/{id}")
-    public String articleUpdate(@PathVariable("id") Long id, 
-                                @Valid @ModelAttribute("article") Article article, 
-                                BindingResult result, 
-                                Model viewModel, 
-                                RedirectAttributes redirectAttributes,
-                                Principal principal, 
-                                MultipartFile file) {
-        
-        if(result.hasErrors()){
-            viewModel.addAttribute("title", "Modifica articolo");
-            article.setImage(articleService.read(id).getImage());
-            viewModel.addAttribute("article", article);
-            viewModel.addAttribute("categories", categoryService.readAll());
-            return "article/edit";
-        }
-        
-        articleService.update(id, article, file);
-        redirectAttributes.addFlashAttribute("successMessage", "Articolo modificato con successo!");
-
-        return "redirect:/articles";
-    }
-    
-    //rotta cancellazione articolo
-    @GetMapping("delete/{id}")
-    public String articleDelete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        articleService.delete(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Articolo eliminato con successo!");
-        return "redirect:/writer/dashboard";
-    }
-    
-    //rotta dettaglio articolo per il revisore
     @GetMapping("revisor/detail/{id}")
     public String revisorDetailArticle(@PathVariable("id") Long id, Model viewModel) {
         viewModel.addAttribute("title", "Article detail");
         viewModel.addAttribute("article", articleService.read(id));
         return "revisor/detail";
     }
-    
-    //rotta dedicata all'azione del revisore
+
     @PostMapping("/accept")
-    public String articleIsAccepted(@RequestParam("action") String action, @RequestParam("articleId") Long articleId, RedirectAttributes redirectAttributes) {
-        
-        if(action.equals("accept")){
+    public String articleSetAccepted(@RequestParam("action") String action, @RequestParam("articleId") Long articleId, RedirectAttributes redirectAttributes) {
+        if (action.equals("accept")){
             articleService.setIsAccepted(true, articleId);
-            redirectAttributes.addFlashAttribute("resultMessage", "Articolo accettato con successo!");
+            redirectAttributes.addFlashAttribute("resultMessage", "Articolo accettato!");
         } else if(action.equals("reject")){
             articleService.setIsAccepted(false, articleId);
-            redirectAttributes.addFlashAttribute("resultMessage", "Articolo rifiutato");
+            redirectAttributes.addFlashAttribute("resultMessage", "Articolo rifiutato!");
         }else{
-            redirectAttributes.addFlashAttribute("resultMessage", "Azione non corretta");
+            redirectAttributes.addFlashAttribute("resultMessage", "Azione non corretta!");
         }
-        
+
         return "redirect:/revisor/dashboard";
     }
 
-    //rotta ricerca articolo
     @GetMapping("/search")
     public String articleSearch(@Param("keyword") String keyword, Model viewModel) {
-        viewModel.addAttribute("title", "Articoli trovati");
+        viewModel.addAttribute("title","Tutti gli articoli trovati");
 
         List<ArticleDto> articles = articleService.search(keyword);
 
@@ -180,4 +142,37 @@ public class ArticleController {
 
         return "article/articles";
     }
+
+    @PostMapping("/update/{id}")
+    public String articleUpdate(@PathVariable("id") Long id,
+                                @Valid @ModelAttribute("article") Article article,
+                                BindingResult result,
+                                RedirectAttributes redirectAttributes,
+                                Principal principal,
+                                MultipartFile file,
+                                Model viewModel) {
+
+    if (result.hasErrors()) {
+        viewModel.addAttribute("title", "Article update");
+        article.setImage(articleService.read(id).getImage());
+        viewModel.addAttribute("article", article);
+        viewModel.addAttribute("categories", categoryService.readAll());
+        return "article/edit";
+    }
+
+    articleService.update(id, article, file);
+    redirectAttributes.addFlashAttribute("successMessage", "Articolo modificato con successo!");
+
+    return "redirect:/articles";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String articleDelete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+
+        articleService.delete(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Articolo cancellato con successo!");
+
+        return "redirect:/writer/dashboard";
+    }
+
 }

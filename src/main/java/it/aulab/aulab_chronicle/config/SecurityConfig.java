@@ -18,48 +18,50 @@ import it.aulab.aulab_chronicle.services.CustomUserDetailsService;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
-     @Autowired
+    @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
-            .csrf(csrf->csrf.disable())
-            .authorizeHttpRequests((authorize)->
-            authorize.requestMatchers("/register/**").permitAll()
-            .requestMatchers("/admin/dashboard", "/categories/create", "/categories/edit/{id}", "/categories/update/{id}", "/categories/delete/{id}").hasRole("ADMIN")
-            .requestMatchers("/admin/dashboard").hasRole("ADMIN") 
-            .requestMatchers("/revisor/dashbaord", "/revisor/detail/{id}", "/accept").hasRole("REVISOR")
-            .requestMatchers("/writer/dashboard", "/articles/create", "/articles/edit/{id}", "/articles/update/{id}", "/articles/delete/{id}").hasRole("WRITER")
-            .requestMatchers("/register", "/", "/articles", "/images/**", "/articles/detail/**", "/categories/search/{id}", "/search/{id}", "/articles/search").permitAll()
-            .anyRequest().authenticated()
-        ).formLogin(form->
-            form.loginPage("/login")
-            .loginProcessingUrl("/login")
-            .defaultSuccessUrl("/")
-            .permitAll()
-        ).logout(logout->logout
-            .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-            .permitAll()
-        ).exceptionHandling(exception->exception.accessDeniedPage("/error/403"))
-            .sessionManagement(session->session
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests((authorize) -> authorize
+                .requestMatchers("/register/**").permitAll()
+                .requestMatchers("/admin/dashboard", "/categories/create", "/categories/edit/{id}", "/categories/update/{id}", "/categories/delete/{id}").hasRole("ADMIN")
+                .requestMatchers("/revisor/dashboard", "revisor/detail/{id}", "/accept").hasRole("REVISOR")
+                .requestMatchers("/writer/dashboard", "/articles/create", "/articles/edit/{id}", "/articles/update/{id}", "/articles/delete/{id}").hasRole("WRITER")
+                .requestMatchers("/register", "/", "/articles", "/images/**", "/articles/detail/**", "/categories/search/{id}", "/search/{id}", "/articles/search").permitAll()
+                .anyRequest().authenticated()
+            ).formLogin(form ->
+                form.loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/")
+                .permitAll()
+            ).logout(logout -> logout
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .permitAll()
+            ).exceptionHandling(exception -> exception.accessDeniedPage("/error/403"))
+            .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .maximumSessions(1)
                 .expiredUrl("/login?session-expired=true")
             );
-        return http.build();            
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception {
-        return authConfiguration.getAuthenticationManager();
+        return http.build();
     }
 
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder);
+    public void configureGlobal(AuthenticationManagerBuilder auth)
+    throws Exception {
+        auth.userDetailsService(customUserDetailsService)
+        .passwordEncoder(passwordEncoder);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

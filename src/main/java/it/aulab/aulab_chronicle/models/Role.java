@@ -14,8 +14,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter //c'è qualche motivo particolare per cui nella documentazione sono stati invertiti @getter e @setter?
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity

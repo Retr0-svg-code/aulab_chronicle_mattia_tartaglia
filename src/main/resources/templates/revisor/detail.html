@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:insert="~{index::head}"></head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{index :: head}"></head>
 <body>
-    <div th:insert="~{index::navbar}"></div>
+    <div th:insert="~{index :: navbar}"></div>
     
     <div class="container-fluid p-5 bg-secondary-subtle text-center">
         <div class="row justify-content-center">
@@ -16,11 +16,11 @@
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 d-flex flex-column">
-                <div class="carousel-slide" id="carouselExample">
+                <div id="carouselExample" class="carousel slide">
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <img th:if="${article.image != null}" th:src="${article.image.path}" class="card-img-top" alt="...">
-                            <img th:src="@{/image/default.jpg}" th:unless="${article.image != null}" class="card-img-top" alt="">
+                            <img th:if="${article.image != null}" th:src="${article.image.path}" alt="..." class="card-img-top">
+                            <img th:unless="${article.image != null}" th:src="@{/images/default.jpg}" alt="..." class="card-img-top">
                         </div>
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
@@ -36,15 +36,15 @@
                 <div class="text-center">
                     <h2 th:text="${article.subtitle}">Sottotitolo</h2>
                     
-                    <p class="fs-5" th:if="${article.subtitle}">Categoria:
-                        <a th:href="@{/categories/search/{id}{id=${article.category.id}}}" th:text="${article.category.name}" class="text-capitalize fw-bold text-muted">categoria"></a>
+                    <p class="fs-5" th:if="${article.category != null}">Categoria
+                        <a th:href="@{/categories/search/{id}(id=${article.category.id})}" class="text-capitalize fw-bold text-muted" th:text="${article.category.name}">categoria</a>
                     </p>
                     
-                    <p class="fs-5" th:if="${article.user == null}">Nessuna categoria"></p>
+                    <p class="fs-5" th:if="${article.category== null}">Nessuna categoria</p>
                     
                     <div class="text-muted my-3">
-                        <p>Redatto il <p th:text="${article.publishDate}">data </p> da
-                        <a href="@{/search/{id}{id=${article.user.id}}}" class="text-muted">
+                        <p>Redatto il <p th:text="${article.publishDate}">data</p> da
+                        <a class="text-muted" th:href="@{/search/{id}(id=${article.user.id})}">
                             <p th:text="${article.user.username}">User</p>
                         </a>
                     </div>
@@ -55,17 +55,17 @@
             <p th:text="${article.body}"></p>
             
             <div class="text-center">
-                <a href="#" class="text-secondary pointer" onclick="goBack()">Torna indietro</a>
+                <a href="" class="text-secondary pointer" onclick="goBack()">Torna indietro</a>
             </div>
             
             <div class="d-flex justify-content-between">
-                <form th:action="@{/article/accept(action='accept', articleId=${article.id})}" method="post">
-                    <button class="btn btn-sucess m-2" type="submit">
+                <form th:action="@{/articles/accept(action='accept', articleId=${article.id})}" method="post">
+                    <button type="submit" class="btn btn-success m-2">
                         Accetta
                     </button>
                 </form>
-                <form th:action="@{/article/accept(action='reject', articleId=${article.id})}" method="post" th:object="${article}">
-                    <button class="btn btn-danger m-2" type="submit">
+                <form th:action="@{/articles/accept(action='reject', articleId=${article.id})}" method="post" th:object="${article}">
+                    <button type="submit" class="btn btn-danger m-2">
                         Rifiuta
                     </button>
                 </form>
@@ -74,8 +74,9 @@
         </div>
     </div>
     
-    <div th:insert="~{index::footer}"></div>
-    <script th:replace="~{index::bootstrapScript}"></script>
+    
+    <div th:insert="~{index :: footer}"></div>
+    <script th:replace="~{index :: bootstrapScript}"></script>
     <script>
         function goBack() {
             window.history.back();

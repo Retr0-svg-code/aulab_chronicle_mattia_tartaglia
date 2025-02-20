@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:insert="~{index::head}"></head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{index :: head}"></head>
 <body>
-    <div th:insert="~{index::navbar}"></div>
+    <div th:insert="~{index :: navbar}"></div>
     
     <div class="vh-100">
         <div class="container">
@@ -15,23 +15,24 @@
                 </div>
 
                 <div class="col-12 my-5">
-                    <form th:action="@{/categories/update/{id}{id=${category.id}}}" method="post" th:object="${category}">
+                    <form th:action="@{/categories/update/{id}(id=${category.id})}" method="POST" th:object="${category}">
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="name" class="form-label">Nome categoria</label>
-                                <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Inserisci il nome della categoria">
-                                <p class="class-danger" th:errors="*{name}" th:if="${#fields.hasErrors('name')}"></p>
+                                <input id="name" type="text" class="form-control" th:field="*{name}" placeholder="Inserisci il nome...">
+                                <p th:errors="*{name}" class="text-danger" th:if="${#fields.hasErrors('name')}"></p>
                             </div>
                         </div>
 
-                        <button class="btn btn-success" type="submit">Aggiorna categoria</button>
+                        <button type="submit" class="btn btn-success">Aggiorna categoria</button>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>
     
-    <div th:insert="~{index::footer}"></div>
-    <script th:replace="~{index::bootstrapScript}"></script>
+    <div th:insert="~{index :: footer}"></div>
+    <script th:replace="~{index :: bootstrapScript}"></script>
 </body>
 </html>

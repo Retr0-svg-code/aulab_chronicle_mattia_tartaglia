@@ -33,110 +33,109 @@ import jakarta.validation.Valid;
 
 @Controller
 public class UserController {
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private ArticleService articleService;
-    @Autowired
-    private CareerRequestRepository careerRequestRepository;
-    @Autowired
-    private CategoryService categoryService;
+
     @Autowired
     private ArticleRepository articleRepository;
+
+    @Autowired
+    private CareerRequestRepository careerRequestRepository;
+
+    @Autowired
+    private CategoryService categoryService;
+
     @Autowired
     private ModelMapper modelMapper;
-
-    //rotta della home
+    
     @GetMapping("/")
-    public String home(Model viewModel) {
-        //recupero articoli accettati
+    public String home(Model viewModel){
+        
         List<ArticleDto> articles = new ArrayList<ArticleDto>();
-        for(Article article : articleRepository.findByIsAcceptedTrue()){
+        for(Article article: articleRepository.findByIsAcceptedTrue()){
             articles.add(modelMapper.map(article, ArticleDto.class));
         }
-        
-        //articoli in ordine decrescente
+
         Collections.sort(articles, Comparator.comparing(ArticleDto::getPublishDate).reversed());
-        
-        List<ArticleDto> lastThreeArticles = articles.stream().limit( 3).collect(Collectors.toList());
+
+        List<ArticleDto> lastThreeArticles = articles.stream().limit(3).collect(Collectors.toList());
 
         viewModel.addAttribute("articles", lastThreeArticles);
-
+        
         return "home";
     }
 
-    //rotta per registrarsi
     @GetMapping("/register")
-    public String register(Model model){
+    public String register(Model model) {
         model.addAttribute("user", new UserDto());
         return "auth/register";
     }
 
-    //rotta per il login
     @GetMapping("/login")
     public String login() {
         return "auth/login";
     }
-
+    
     @PostMapping("/register/save")
     public String registration(@Valid @ModelAttribute("user") UserDto userDto,
-                                BindingResult result, 
+                                BindingResult result,
                                 Model model,
-                                RedirectAttributes redirectAttributes, 
+                                RedirectAttributes redirectAttributes,
                                 HttpServletRequest request, HttpServletResponse response){
-                                
+
         User existingUser = userService.findUserByEmail(userDto.getEmail());
-        
-        if(existingUser !=null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()){
-            result.rejectValue("email", null, "Email is already in use!");
+    
+        if (existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()){
+            result.rejectValue("email", null, "There is already an account registered with the same email");
         }
-        if(result.hasErrors()){
+
+        if (result.hasErrors()){
             model.addAttribute("user", userDto);
             return "auth/register";
         }
-
+        
         userService.saveUser(userDto, redirectAttributes, request, response);
         
-        redirectAttributes.addFlashAttribute("successMessage", "User registered successfully");
-        return "redirect:/register?success";
-    }
+        redirectAttributes.addFlashAttribute("successMessage", "Registrazione avvenuta!");
 
+        return "redirect:/";
+
+    }
+        
     @GetMapping("/search/{id}")
-    public String userArticleSearch(@PathVariable("id") Long id, Model viewModel) {
+    public String userArticlesSearch(@PathVariable("id") Long id, Model viewModel) {
         User user = userService.find(id);
-        viewModel.addAttribute("title", "Tutti gli articoli di " + user.getUsername());
+        viewModel.addAttribute("title", "Tutti gli articoli trovati per l`utente " + user.getUsername());
 
         List<ArticleDto> articles = articleService.searchByAuthor(user);
-
         List<ArticleDto> acceptedArticles = articles.stream().filter(article -> Boolean.TRUE.equals(article.getIsAccepted())).collect(Collectors.toList());
-
         viewModel.addAttribute("articles", acceptedArticles);
-
+        
         return "article/articles";
     }
 
-    //rotta dashboard admin
     @GetMapping("/admin/dashboard")
     public String adminDashboard(Model viewModel) {
         viewModel.addAttribute("title", "Richieste ricevute");
-        viewModel.addAttribute("requests", careerRequestRepository.findByIsCheckedFalse());
+        viewModel.addAttribute("requests", careerRequestRepository. findByIsCheckedFalse());
         viewModel.addAttribute("categories", categoryService.readAll());
-
         return "admin/dashboard";
     }
 
-    //rotta dashboard revisore
     @GetMapping("/revisor/dashboard")
-    public String revisorDashboard(Model viewModel){
+    public String revisorDashboard(Model viewModel) {
         viewModel.addAttribute("title", "Articoli da revisionare");
         viewModel.addAttribute("articles", articleRepository.findByIsAcceptedIsNull());
         return "revisor/dashboard";
     }
 
-    //rotta dashboard writer
     @GetMapping("/writer/dashboard")
-    public String writerDashboard(Model viewModel, Principal principal){
-
+    public String writerDashboard(Model viewModel , Principal principal) {
+        
         viewModel.addAttribute("title", "I tuoi articoli");
 
         List<ArticleDto> userArticles = articleService.readAll()

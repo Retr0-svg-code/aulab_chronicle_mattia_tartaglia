@@ -18,7 +18,7 @@ public class ArticleDto {
     private String subtitle;
     private String body;
     private LocalDate publishDate;
-    private Boolean isAccepted;
+    private Boolean isAccepted; 
     private User user;
     private Category category;
     private Image image;

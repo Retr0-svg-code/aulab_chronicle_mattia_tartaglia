@@ -23,148 +23,146 @@ import it.aulab.aulab_chronicle.repositories.ArticleRepository;
 import it.aulab.aulab_chronicle.repositories.UserRepository;
 
 @Service
-public class ArticleService implements CrudService<ArticleDto, Article, Long> {
+public class ArticleService implements CrudService<ArticleDto, Article, Long>{
+
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private ModelMapper modelMapper;
+
     @Autowired
     private ArticleRepository articleRepository;
+
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @Override
     public List<ArticleDto> readAll() {
-        List<ArticleDto> dtos=new ArrayList<ArticleDto>();
-        for(Article article:articleRepository.findAll()) {
+        List<ArticleDto> dtos = new ArrayList<ArticleDto>();
+        for(Article article: articleRepository.findAll()){
             dtos.add(modelMapper.map(article, ArticleDto.class));
         }
         return dtos;
     }
+
     @Override
     public ArticleDto read(Long key) {
         Optional<Article> optArticle = articleRepository.findById(key);
-        if(optArticle.isPresent()){
+        if (optArticle.isPresent()) {
             return modelMapper.map(optArticle.get(), ArticleDto.class);
-        }else{
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Author id= " + key + " not found");
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Author id=" + key + " not found");
         }
     }
+
     @Override
     public ArticleDto create(Article article, Principal principal, MultipartFile file) {
         String url = "";
-        
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication != null) {
+        if (authentication != null) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = (userRepository.findById(userDetails.getId())).get();
             article.setUser(user);
         }
 
         if(!file.isEmpty()){
-            try{
-                CompletableFuture<String> futureUrl = imageService.uploadImage(file);
+            try {
+                CompletableFuture<String> futureUrl = imageService.saveImageOnCloud(file);
                 url = futureUrl.get();
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
         article.setIsAccepted(null);
 
-        ArticleDto dto=modelMapper.map(articleRepository.save(article), ArticleDto.class);
+        ArticleDto dto = modelMapper.map(articleRepository.save(article), ArticleDto.class);
+        
         if(!file.isEmpty()){
             imageService.saveImageOnDB(url, article);
         }
-
         return dto;
     }
+
     @Override
-    public ArticleDto update(Long key, Article updateArticle, MultipartFile file) {
-        String url = "";
+    public ArticleDto update(Long key, Article updatedArticle, MultipartFile file) {
+        String url="";
 
-        //controllo se l'articolo esiste in base all'id
         if(articleRepository.existsById(key)){
-            //assegno all'articolo proveniente dal form lo stesso id dell'articolo da modificare
-            updateArticle.setId(key);
-            //recupero l'articolo originale non modificato
+            updatedArticle.setId(key);
             Article article = articleRepository.findById(key).get();
-            //imposto l'utente dell'articolo originale all'articolo proveniente dal form
-            updateArticle.setUser(article.getUser());
+            updatedArticle.setUser(article.getUser());
 
-            //verifico se devo modificare o meno l'immagine
             if(!file.isEmpty()){
                 try{
-                    //elimino l'immagine precedente
                     imageService.deleteImage(article.getImage().getPath());
                     try{
-                        //salvo l'immagine nuova
                         CompletableFuture<String> futureUrl = imageService.saveImageOnCloud(file);
                         url = futureUrl.get();
-                    }catch(Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    //salvo il nuovo path nel database
-                    imageService.saveImageOnDB(url, updateArticle);
 
-                    //immagine modificata, articolo in revisione
-                    updateArticle.setIsAccepted(null);
-                    return modelMapper.map(articleRepository.save(updateArticle), ArticleDto.class);
-                }catch(Exception e){
+                    imageService.saveImageOnDB(url, updatedArticle);
+
+                    updatedArticle.setIsAccepted(null);
+                    return modelMapper.map(articleRepository.save(updatedArticle), ArticleDto.class);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }else if(article.getImage() == null){ //se l'articolo originale non ha nulla di nuovo, allora non è stato modificato nulla
-                updateArticle.setIsAccepted(article.getIsAccepted());
+            }else if(article.getImage() == null){
+                updatedArticle.setIsAccepted(article.getIsAccepted());
             }else{
-                //se non è stata modificata l'immagine, faccio un check se tutti i campi e se diversi l'articolo torna in revisione
 
-                //se non è stata modificata l'immagine, rimetto la stessa immagine dell'articolo originale
-                updateArticle.setImage(article.getImage());
+                updatedArticle.setImage(article.getImage());
 
-                if(updateArticle.equals(article)==false){
-                    updateArticle.setIsAccepted(null);
+                if(updatedArticle.equals(article)==false){
+                    updatedArticle.setIsAccepted(null);
                 }else{
-                    updateArticle.setIsAccepted(article.getIsAccepted());
+                    updatedArticle.setIsAccepted(article.getIsAccepted());
                 }
 
-                return modelMapper.map(articleRepository.save(updateArticle), ArticleDto.class);
+                return modelMapper.map(articleRepository.save(updatedArticle), ArticleDto.class);
             }
-        }else{
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         return null;
     }
-    
+
     @Override
     public void delete(Long key) {
-        if(articleRepository.existsById(key)){
+        if (articleRepository.existsById(key)) {
+
             Article article = articleRepository.findById(key).get();
 
-            try{
+            try {
                 String path = article.getImage().getPath();
                 article.getImage().setArticle(null);
                 imageService.deleteImage(path);
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
             articleRepository.deleteById(key);
-        }else{
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
     }
 
-    public List<ArticleDto> searchByCategory(Category category) {
-        List<ArticleDto> dtos=new ArrayList<ArticleDto>();
-        for(Article article:articleRepository.findByCategory(category)) {
+    public List<ArticleDto> searchByCategory(Category category){
+        List<ArticleDto> dtos = new ArrayList<ArticleDto>();
+        for(Article article: articleRepository.findByCategory(category)){
             dtos.add(modelMapper.map(article, ArticleDto.class));
         }
         return dtos;
     }
 
-    public List<ArticleDto> searchByAuthor(User user) {
-        List<ArticleDto> dtos=new ArrayList<ArticleDto>();
-        for(Article article:articleRepository.findByUser(user)) {
+    public List<ArticleDto> searchByAuthor(User user){
+        List<ArticleDto> dtos = new ArrayList<ArticleDto>();
+        for(Article article: articleRepository.findByUser(user)){
             dtos.add(modelMapper.map(article, ArticleDto.class));
         }
         return dtos;
@@ -177,11 +175,11 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long> {
     }
 
     public List<ArticleDto> search(String keyword){
-        List<ArticleDto> dtos=new ArrayList<ArticleDto>();
-        for(Article article:articleRepository.search(keyword)) {
+        List<ArticleDto> dtos = new ArrayList<ArticleDto>();
+        for(Article article: articleRepository.search(keyword)){
             dtos.add(modelMapper.map(article, ArticleDto.class));
         }
         return dtos;
     }
-    
+
 }

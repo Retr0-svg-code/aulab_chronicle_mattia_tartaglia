@@ -27,16 +27,10 @@ public class Category {
     private Long id;
 
     @Column(nullable = false, length = 100)
-    @NotEmpty(message="Name cannot be empty")
-    @Size(max=50)
+    @NotEmpty(message = "Il nome non deve essere vuoto")
+    @Size(max = 50)
     private String name;
 
-    @Column(nullable = false, length = 100)
-    @NotEmpty
-    @Size(max=100)
-    private String subtitle;
-
     @OneToMany(mappedBy = "category")
-    private List<Article> articles=new ArrayList<Article>();
-    
+    private List<Article> articles = new ArrayList<Article>();
 }

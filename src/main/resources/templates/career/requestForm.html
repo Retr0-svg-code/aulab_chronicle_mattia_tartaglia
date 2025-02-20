@@ -1,40 +1,41 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:insert="~{index::head}"></head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{index :: head}"></head>
 <body>
-    <div th:insert="~{index::navbar}"></div>
-    
+    <div th:insert="~{index :: navbar}"></div>
+
     <div class="vh-100">
         <div class="container">
             <div class="row">
-                
+
                 <div class="col-12 my-5 d-flex justify-content-between align-items-center">
                     <div class="d-flex justify-content-center align-items-center flex-grow-1">
-                        <h1 th:text="${title}">Richiesta collaborazione</h1>
+                        <h1 th:text="${title}">Richiesta di collaborazione</h1>
                     </div>
                 </div>
 
                 <div class="col-12 my-5">
-                    <form th:action="@{/operations/career/request/save}" method="post" th:object="${careerRequest}" enctype="multipart/form-data">
+                    <form th:action="@{/operations/career/request/save}" method="POST" th:object="${careerRequest}" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="body" class="form-label">Motivo della richiesta:</label>
-                            <textarea th:field="*{body}" class="form-control" id="body" placeholder="Inserisci una motivazione..."></textarea>
+                            <textarea id="body" class="form-control" th:field="*{body}" placeholder="Inserisci la motivazione..."></textarea>
                         </div>
+
                         <div class="mb-3">
                             <label for="role" class="form-label">Per quale ruolo?</label>
-                            <select  id="role" th:field="*{role}" class="form-select">
-                                <option th:value="${role.id}" th:each="role : ${roles}" th:text="${#strings.substring(role.name, 5)}"></option>
+                            <select id="role" th:field="*{role}" class="form-select">
+                                <option th:each="role:${roles}" th:value="${role.id}" th:text="${#strings.substring(role.name, 5)}"></option>
                             </select>
                         </div>
 
-                        <button type="submit" class="btn btn-success">Effettua la richiesta</button>
+                        <button type="submit" class="btn btn-success">Effettua richiesta</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div th:insert="~{index::footer}"></div>
-    <script th:replace="~{index::bootstrapScript}"></script>
+
+    <div th:insert="~{index :: footer}"></div>
+    <script th:replace="~{index :: bootstrapScript}"></script>
 </body>
 </html>

@@ -25,17 +25,20 @@ import jakarta.validation.Valid;
 @Controller
 @RequestMapping("/categories")
 public class CategoryController {
+
     @Autowired
     private ArticleService articleService;
+
     @Autowired
     private CategoryService categoryService;
+
     @Autowired
     private ModelMapper modelMapper;
 
-    //rotta ricerca articolo per categoria
     @GetMapping("/search/{id}")
-    public String categorySearch(@PathVariable("id") Long id, Model viewModel){
+    public String categorySearch(@PathVariable("id") Long id, Model viewModel) {
         CategoryDto category = categoryService.read(id);
+
         viewModel.addAttribute("title", "Tutti gli articoli trovati per categoria " + category.getName());
 
         List<ArticleDto> articles = articleService.searchByCategory(modelMapper.map(category, Category.class));
@@ -46,67 +49,60 @@ public class CategoryController {
         return "article/articles";
     }
 
-    //rotta creazione categoria
     @GetMapping("create")
-    public String categoryCreate(Model viewModel){
-        viewModel.addAttribute("title", "Crea categoria");
-        viewModel.addAttribute("category", new CategoryDto());
-        return "categories/create";
+    public String categoryCreate(Model viewModel) {
+        viewModel.addAttribute("title", "Crea una categoria");
+        viewModel.addAttribute("category", new Category());
+        return "category/create";
     }
 
     @PostMapping
     public String categoryStore(@Valid @ModelAttribute("category") Category category,
-                                BindingResult result, 
+                                BindingResult result,
                                 RedirectAttributes redirectAttributes,
-                                Model viewModel){
-        
-        //controllo errori di validazione
-        if(result.hasErrors()){
-            viewModel.addAttribute("title", "Crea categoria");
+                                Model viewModel) {
+        if(result.hasErrors()) {
+            viewModel.addAttribute("title", "Crea una categoria");
             viewModel.addAttribute("category", category);
-            return "categories/create";
+            return "category/create";
         }
 
         categoryService.create(category, null, null);
-        redirectAttributes.addFlashAttribute("successMessage", "Categoria creata con successo");
+        redirectAttributes.addFlashAttribute("successMessage", "Categoria aggiunta con successo!");
 
         return "redirect:/admin/dashboard";
     }
 
-    //rotta modifica categoria
     @GetMapping("/edit/{id}")
-    public String categoryEdit(@PathVariable("id") Long id, Model viewModel){
+    public String categoryEdit (@PathVariable("id") Long id, Model viewModel) {
         viewModel.addAttribute("title", "Modifica categoria");
         viewModel.addAttribute("category", categoryService.read(id));
         return "category/update";
     }
 
-    //rotta memorizzazione categoria modificata
     @PostMapping("/update/{id}")
     public String categoryUpdate(@PathVariable("id") Long id,
                                 @Valid @ModelAttribute("category") Category category,
-                                BindingResult result, 
+                                BindingResult result,
                                 RedirectAttributes redirectAttributes,
-                                Model viewModel){
-        //controllo errori di validazione
-        if(result.hasErrors()){
+                                Model viewModel) {
+        if(result.hasErrors()) {
             viewModel.addAttribute("title", "Modifica categoria");
             viewModel.addAttribute("category", category);
-            return "categories/update";
+            return "category/update";
         }
 
         categoryService.update(id, category, null);
-        redirectAttributes.addFlashAttribute("successMessage", "Categoria modificata con successo");
+        redirectAttributes.addFlashAttribute("successMessage", "Categoria modificata con successo!");
 
-        return "redirect:/admin/dashboard";
+        return "redirect:/admin/dashboard"; 
     }
 
-    //rotta cancellazione categoria
-    @GetMapping("/delete/{id}")
-    public String categoryDelete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes){
+    @GetMapping("delete/{id}")
+    public String categoryDelete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
 
         categoryService.delete(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Categoria eliminata con successo");
+        redirectAttributes.addFlashAttribute("successMessage", "Categoria cancellata con successo!");
 
         return "redirect:/admin/dashboard";
     }

@@ -10,7 +10,7 @@ import it.aulab.aulab_chronicle.models.Article;
 import it.aulab.aulab_chronicle.models.Category;
 import it.aulab.aulab_chronicle.models.User;
 
-public interface ArticleRepository extends ListCrudRepository<Article, Long> {
+public interface ArticleRepository extends ListCrudRepository<Article, Long>{
     List<Article> findByCategory(Category category);
     List<Article> findByUser(User user);
     List<Article> findByIsAcceptedTrue();
@@ -18,9 +18,10 @@ public interface ArticleRepository extends ListCrudRepository<Article, Long> {
     List<Article> findByIsAcceptedIsNull();
 
     @Query("SELECT a FROM Article a WHERE " +
-            "LOWER(a.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(a.subtitle) LIKe LOWER (CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(a.user.username) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(a.category.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+        "LOWER(a.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+        "LOWER(a.subtitle) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+        "LOWER(a.user.username) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+        "LOWER(a.body) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+        "LOWER(a.category.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     List<Article> search(@Param("searchTerm") String searchTerm);
 }

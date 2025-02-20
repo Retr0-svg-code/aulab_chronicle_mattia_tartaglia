@@ -7,11 +7,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class ExceptionHandlingController {
+
     @GetMapping("/error/{number}")
-    public String accesDenied(@PathVariable int number, Model model){
-        if(number==403){
+    public String accessDenied(@PathVariable int number, Model model) {
+        if(number == 403){
             return "redirect:/?notAuthorized";
         }
         return "redirect:/";
     }
+
 }
